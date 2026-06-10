@@ -43,7 +43,7 @@ async def chat_with_companion(message: ChatMessage):
     try:
         # Gemini Model का इस्तेमाल (Free और फ़ास्ट मॉडल)
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+           model_name="gemini-1.5-flash-latest",  # यहाँ -latest जोड़ दिया
             system_instruction=system_instructions
         )
         
