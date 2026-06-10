@@ -6,6 +6,8 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import google.generativeai as genai  # Gemini इम्पोर्ट किया
 from PIL import Image
+import torch
+
 
 app = FastAPI(title="AI Companion Backend")
 
