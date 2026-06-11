@@ -41,11 +41,11 @@ async def chat_with_companion(message: ChatMessage):
     system_instructions = CRISIS_PROMPT if is_crisis else NORMAL_PROMPT
 
     try:
-        # Gemini Model का इस्तेमाल (Free और फ़ास्ट मॉडल)
-        model = genai.GenerativeModel(
-           model_name="gemini-1.5-flash-latest",  # यहाँ -latest जोड़ दिया
-            system_instruction=system_instructions
-        )
+       # NEW FIXED CODE
+model = genai.GenerativeModel(
+    model_name="models/gemini-1.5-flash",  # "models/" added here to fix the 404 error
+    system_instruction=system_instructions
+)
         
         response = model.generate_content(message.user_message)
         ai_reply = response.text
