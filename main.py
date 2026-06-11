@@ -40,9 +40,9 @@ async def chat_with_companion(message: ChatMessage):
     system_instructions = CRISIS_PROMPT if is_crisis else NORMAL_PROMPT
 
     try:
-        # Fixed model path and strictly indented with 8 spaces
+        # Standard model string initialization
         model = genai.GenerativeModel(
-            model_name="models/gemini-1.5-flash",  # Fixed 404 model name path
+            model_name="gemini-1.5-flash",
             system_instruction=system_instructions
         )
         
@@ -59,7 +59,6 @@ async def chat_with_companion(message: ChatMessage):
 @app.post("/generate-avatar")
 async def generate_avatar(file: UploadFile = File(...)):
     try:
-        # Torch and GPU checks removed. Image Processing happens directly on CPU via Pillow.
         input_bytes = await file.read()
         img = Image.open(io.BytesIO(input_bytes))
         img_io = io.BytesIO()
