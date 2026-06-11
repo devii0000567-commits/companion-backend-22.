@@ -4,13 +4,14 @@ import asyncio
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-import google.generativeai as genai  # Gemini इम्पोर्ट किया
+from google import genai  # Modern Google GenAI SDK
+from google.genai import types
 from PIL import Image
 
 app = FastAPI(title="AI Companion Backend")
 
-# यह लाइन Render से आपकी Gemini API Key अपने आप उठा लेगी
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+# Initialize the client (automatically picks up GEMINI_API_KEY from environment)
+client = genai.Client()
 
 CRISIS_KEYWORDS = [
     "end my life", "suicide", "want to die", "hurt myself", 
@@ -40,13 +41,15 @@ async def chat_with_companion(message: ChatMessage):
     system_instructions = CRISIS_PROMPT if is_crisis else NORMAL_PROMPT
 
     try:
-        # Standard model string initialization
-        model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
-            system_instruction=system_instructions
+        # Using the standard modern endpoint format 'gemini-2.5-flash'
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=message.user_message,
+            config=types.GenerateContentConfig(
+                system_instruction=system_instructions,
+            ),
         )
         
-        response = model.generate_content(message.user_message)
         ai_reply = response.text
         
         return {
