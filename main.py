@@ -7,7 +7,6 @@ from pydantic import BaseModel
 import google.generativeai as genai  # Gemini इम्पोर्ट किया
 from PIL import Image
 
-
 app = FastAPI(title="AI Companion Backend")
 
 # यह लाइन Render से आपकी Gemini API Key अपने आप उठा लेगी
@@ -41,11 +40,11 @@ async def chat_with_companion(message: ChatMessage):
     system_instructions = CRISIS_PROMPT if is_crisis else NORMAL_PROMPT
 
     try:
-       # NEW FIXED CODE
-model = genai.GenerativeModel(
-    model_name="models/gemini-1.5-flash",  # "models/" added here to fix the 404 error
-    system_instruction=system_instructions
-)
+        # Fixed model path and strictly indented with 8 spaces
+        model = genai.GenerativeModel(
+            model_name="models/gemini-1.5-flash",  # Fixed 404 model name path
+            system_instruction=system_instructions
+        )
         
         response = model.generate_content(message.user_message)
         ai_reply = response.text
@@ -59,15 +58,13 @@ model = genai.GenerativeModel(
 
 @app.post("/generate-avatar")
 async def generate_avatar(file: UploadFile = File(...)):
-    if not torch.cuda.is_available():
-        try:
-            input_bytes = await file.read()
-            img = Image.open(io.BytesIO(input_bytes))
-            img_io = io.BytesIO()
-            img.save(img_io, 'PNG')
-            img_io.seek(0)
-            return StreamingResponse(img_io, media_type="image/png")
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-            
-    raise HTTPException(status_code=501, detail="GPU pipeline active on cloud deployment only.")
+    try:
+        # Torch and GPU checks removed. Image Processing happens directly on CPU via Pillow.
+        input_bytes = await file.read()
+        img = Image.open(io.BytesIO(input_bytes))
+        img_io = io.BytesIO()
+        img.save(img_io, 'PNG')
+        img_io.seek(0)
+        return StreamingResponse(img_io, media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
